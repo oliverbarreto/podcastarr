@@ -107,7 +107,7 @@ export default function StatsPage() {
     } else {
       // Set all bars to default color except the clicked one
       newData.forEach((item) => {
-        item.fill = item.name === clickedTag ? "#000000" : "#8884d8"
+        item.fill = item.name === clickedTag ? "#6D28D9" : "#8884d8"
       })
       setSelectedTag(clickedTag)
     }
@@ -218,7 +218,7 @@ export default function StatsPage() {
                 <Legend /> */}
                   <Bar
                     dataKey="count"
-                    fill="#000000"
+                    fill="#6D28D9"
                     onClick={handleClick}
                     cursor="pointer"
                   >

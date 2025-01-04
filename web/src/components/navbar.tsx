@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Mic, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/context/UserContext"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function Navbar() {
   const router = useRouter()
@@ -34,6 +35,7 @@ export default function Navbar() {
           >
             Stats
           </Link>
+          <ThemeToggle />
           <Button
             onClick={handleProfileClick}
             className="rounded-full p-0 w-8 h-8 overflow-hidden"

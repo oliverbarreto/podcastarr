@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect } from "react"
-import type { UserInfo } from "@/types/user"
+import type { UserInfo } from "@/app/types/user"
 
 interface UserContextType {
   userInfo: UserInfo | null
