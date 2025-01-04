@@ -22,8 +22,10 @@ import {
   deleteEpisode,
   getUserInfo
 } from "@/lib/db"
-import { PodcastEpisode, UserInfo } from "@/app/types/podcasts"
 import EpisodeCard from "@/components/episodecard"
+
+import { UserInfo } from "@/app/types/user"
+import { PodcastEpisode } from "@/app/types/podcastepisode"
 
 const tagColors = [
   "bg-pink-500",

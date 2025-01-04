@@ -1,5 +1,5 @@
-import { PodcastEpisode } from "@/app/types/podcasts"
-import { UserInfo } from "@/types/user"
+import { PodcastEpisode } from "@/app/types/podcastepisode"
+import { UserInfo } from "@/app/types/user"
 
 // Mock storage
 let storage: {

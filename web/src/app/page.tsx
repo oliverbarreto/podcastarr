@@ -7,7 +7,6 @@ import {
   updateEpisode,
   deleteEpisode
 } from "@/lib/db"
-import { PodcastEpisode, UserInfo } from "@/app/types/podcasts"
 import EpisodeCard from "@/components/episodecard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +21,9 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+
+import { UserInfo } from "@/app/types/user"
+import { PodcastEpisode } from "@/app/types/podcastepisode"
 
 export default function Home() {
   const [newlyAdded, setNewlyAdded] = useState<PodcastEpisode[]>([])
