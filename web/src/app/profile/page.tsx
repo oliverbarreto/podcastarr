@@ -25,8 +25,9 @@ import {
 } from "lucide-react"
 
 import { setUserInfo } from "@/lib/db"
-import { UserInfo } from "../types/user"
+import { UserInfo } from "@/app/types/user"
 import { useUser } from "@/context/UserContext"
+import Link from "next/link"
 
 export default function ProfilePage() {
   const { userInfo, updateUserInfo } = useUser()
@@ -96,6 +97,18 @@ export default function ProfilePage() {
           Configure your podcast channel settings and information. This info
           will be used and visible by the podcast app.
         </p>
+        <div className="mt-2">
+          {userInfo.userName && (
+            <Link
+              href={`/${userInfo.userName
+                .replace(/\s+/g, "")
+                .toLowerCase()}/public`}
+              className="text-sm text-primary hover:underline"
+            >
+              View public profile →
+            </Link>
+          )}
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">

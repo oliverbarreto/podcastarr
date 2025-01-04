@@ -33,8 +33,9 @@
    4. Episode Details page to show details of an episode
    5. Stats page to show stats of the channel
    6. Settings page to set user info and channel required info for iTunes
-   7. Personal Public page to show the public page of the channel
-   8. Podcast XML Feed for iTunes
+   7. Dark Mode Toggle
+   8. Personal Public page to show the data about the channel: sometimes required to have a public page to show the data about the channel
+   9. Podcast XML Feed for iTunes
 
 ### Other Requirements for features:
 

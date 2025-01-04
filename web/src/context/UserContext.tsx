@@ -12,7 +12,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined)
 
 const defaultUserInfo: UserInfo = {
   id: 0,
-  userName: "",
+  userName: "defaultuser",
   channelName: "",
   channelDescription: "",
   logoUrl: "",
