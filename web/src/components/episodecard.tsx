@@ -1,6 +1,6 @@
 import { useState } from "react"
 import Link from "next/link"
-import { PodcastEpisode } from "@/app/types/podcasts"
+import { PodcastEpisode } from "@/app/types/podcastepisode"
 import { Button } from "@/components/ui/button"
 import { Pencil, Trash2 } from "lucide-react"
 
