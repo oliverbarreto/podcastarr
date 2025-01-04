@@ -1,14 +1,7 @@
 "use client"
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode
-} from "react"
-import { UserInfo } from "@/app/types/podcasts"
-import { getUserInfo } from "@/lib/db"
+import { createContext, useContext, useState, useEffect } from "react"
+import type { UserInfo } from "@/types/user"
 
 interface UserContextType {
   userInfo: UserInfo | null
@@ -17,19 +10,49 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
-export function UserProvider({ children }: { children: ReactNode }) {
+const defaultUserInfo: UserInfo = {
+  id: 0,
+  userName: "",
+  channelName: "",
+  channelDescription: "",
+  logoUrl: "",
+  personalWebsite: "",
+  feedUrl: "",
+  authorName: "",
+  authorEmail: "",
+  ownerName: "",
+  ownerEmail: "",
+  isExplicitContent: false,
+  language: "en"
+}
+
+export function UserProvider({ children }: { children: React.ReactNode }) {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const loadUserInfo = async () => {
-      const info = await getUserInfo()
-      setUserInfo(info || null)
+    // Simulate fetching user data
+    // In a real app, this would be an API call
+    const initializeUser = async () => {
+      try {
+        // For now, just use default values
+        setUserInfo(defaultUserInfo)
+      } catch (error) {
+        console.error("Error initializing user:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-    loadUserInfo()
+
+    initializeUser()
   }, [])
 
   const updateUserInfo = (info: UserInfo) => {
     setUserInfo(info)
+  }
+
+  if (isLoading) {
+    return null // Or a loading spinner component
   }
 
   return (

@@ -71,7 +71,18 @@ export default function ProfilePage() {
   }
 
   if (!userInfo) {
-    return <div className="container mx-auto py-10">Loading...</div>
+    return (
+      <div className="container max-w-3xl mx-auto py-10">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p className="text-muted-foreground">
+              Loading profile information...
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -143,7 +154,7 @@ export default function ProfilePage() {
 
           <div className="grid gap-4 pl-7">
             <div className="flex justify-center">
-              <div className="w-20 h-20 rounded-full overflow-hidden">
+              <div className="w-40 h-40 rounded-full overflow-hidden">
                 {userInfo.logoUrl ? (
                   <img
                     src={userInfo.logoUrl}
@@ -151,7 +162,7 @@ export default function ProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <div className="w-full h-full bg-gray-400 flex items-center justify-center">
                     <User className="w-12 h-12 text-gray-400" />
                   </div>
                 )}

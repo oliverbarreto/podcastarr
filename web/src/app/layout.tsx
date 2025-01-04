@@ -11,7 +11,15 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Podcast App",
-  description: "Yur own private podcast radio station"
+  description: "Your podcast hosting platform",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.svg",
+        href: "/favicon.svg"
+      }
+    ]
+  }
 }
 
 export default function RootLayout({
