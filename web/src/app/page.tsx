@@ -21,6 +21,7 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import EpisodeCardCompact from "@/components/episodecardcompact"
 
 import { UserInfo } from "@/app/types/user"
 import { PodcastEpisode } from "@/app/types/podcastepisode"
@@ -142,6 +143,23 @@ export default function Home() {
 
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Newly Added</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {newlyAdded.map((episode) => (
+            <EpisodeCardCompact key={episode.id} episode={episode} />
+          ))}
+        </div>
+      </section>
+      <section className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4">Recently Updated</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {recentlyUpdated.map((episode) => (
+            <EpisodeCardCompact key={episode.id} episode={episode} />
+          ))}
+        </div>
+      </section>
+
+      {/* <section className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4">Newly Added</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {newlyAdded.map((episode) => (
             <EpisodeCard
@@ -152,9 +170,9 @@ export default function Home() {
             />
           ))}
         </div>
-      </section>
+      </section> */}
 
-      <section className="mb-10">
+      {/* <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Recently Updated</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {recentlyUpdated.map((episode) => (
@@ -166,8 +184,7 @@ export default function Home() {
             />
           ))}
         </div>
-      </section>
-
+      </section> */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
