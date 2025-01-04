@@ -86,7 +86,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container max-w-3xl mx-auto py-10">
+    <div className="container max-w-5xl mx-auto py-10">
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Podcast className="w-8 h-8" />
@@ -153,6 +153,15 @@ export default function ProfilePage() {
           </div>
 
           <div className="grid gap-4 pl-7">
+            <div className="flex-1">
+              <Label htmlFor="logoUrl">Logo URL</Label>
+              <Input
+                id="logoUrl"
+                name="logoUrl"
+                defaultValue={userInfo.logoUrl}
+                placeholder="https://example.com/logo.png"
+              />
+            </div>{" "}
             <div className="flex justify-center">
               <div className="w-40 h-40 rounded-full overflow-hidden">
                 {userInfo.logoUrl ? (
@@ -168,15 +177,6 @@ export default function ProfilePage() {
                 )}
               </div>
             </div>
-          </div>
-          <div className="flex-1">
-            <Label htmlFor="logoUrl">Logo URL</Label>
-            <Input
-              id="logoUrl"
-              name="logoUrl"
-              defaultValue={userInfo.logoUrl}
-              placeholder="https://example.com/logo.png"
-            />
           </div>
         </div>
 

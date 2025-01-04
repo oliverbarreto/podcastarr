@@ -10,8 +10,8 @@ import { UserProvider } from "@/context/UserContext"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Podcast App",
-  description: "Your podcast hosting platform",
+  title: "PodcastARR | Your personal podcast platform",
+  description: "Your personal podcast platform",
   icons: {
     icon: [
       {

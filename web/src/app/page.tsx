@@ -127,7 +127,7 @@ export default function Home() {
   }
 
   return (
-    <main className="container mx-auto py-10">
+    <main className="container max-w-5xl mx-auto py-10">
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold mb-4">
           {userInfo?.channelName ||
