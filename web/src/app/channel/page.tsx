@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -15,17 +15,10 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { PlusCircle } from "lucide-react"
-import {
-  getEpisodes,
-  addEpisode,
-  updateEpisode,
-  deleteEpisode,
-  getUserInfo
-} from "@/lib/db/db"
 import EpisodeCard from "@/components/episodecard"
+import { useUser } from "@/context/UserContext"
 
-import { UserInfo } from "@/app/types/user"
-import { PodcastEpisode } from "@/app/types/podcastepisode"
+import type { PodcastEpisode } from "@/app/types/podcastepisode"
 
 const tagColors = [
   "bg-pink-500",
@@ -38,7 +31,8 @@ const tagColors = [
   "bg-orange-500"
 ]
 
-export default function Home() {
+export default function ChannelPage() {
+  const { channelInfo } = useUser()
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [editingEpisode, setEditingEpisode] = useState<PodcastEpisode | null>(
@@ -46,7 +40,6 @@ export default function Home() {
   )
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [allTags, setAllTags] = useState<string[]>([])
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
 
   const filteredEpisodes =
     selectedTags.length === 0
@@ -55,86 +48,15 @@ export default function Home() {
           episode.tags.some((tag) => selectedTags.includes(tag))
         )
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const [fetchedEpisodes, fetchedUserInfo] = await Promise.all([
-        getEpisodes(),
-        getUserInfo()
-      ])
-      setEpisodes(fetchedEpisodes)
-      const tags = Array.from(
-        new Set(fetchedEpisodes.flatMap((episode) => episode.tags))
-      )
-      setAllTags(tags)
-      setUserInfo(fetchedUserInfo || null)
-    }
-    fetchData()
-  }, [])
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const episodeData = {
-      title: formData.get("title") as string,
-      description: formData.get("description") as string,
-      url: formData.get("url") as string,
-      thumbnail: formData.get("thumbnail") as string,
-      tags: (formData.get("tags") as string).split(",").map((tag) => tag.trim())
-    }
-
-    try {
-      if (editingEpisode) {
-        const updatedEpisode = await updateEpisode(
-          editingEpisode.id,
-          episodeData
-        )
-        setEpisodes((prevEpisodes) =>
-          prevEpisodes.map((ep) =>
-            ep.id === updatedEpisode.id ? updatedEpisode : ep
-          )
-        )
-        setEditingEpisode(null)
-      } else {
-        const newEpisode = await addEpisode(episodeData)
-        setEpisodes((prevEpisodes) => [...prevEpisodes, newEpisode])
-        updateAllTags([...episodes, newEpisode])
-      }
-      setIsOpen(false)
-    } catch (error) {
-      console.error("Error submitting episode:", error)
-    }
-  }
-
-  const handleEdit = (episode: PodcastEpisode) => {
-    setEditingEpisode(episode)
-    setIsOpen(true)
-  }
-
-  const handleDelete = async (id: number) => {
-    await deleteEpisode(id)
-    setEpisodes((prevEpisodes) => {
-      const updatedEpisodes = prevEpisodes.filter((ep) => ep.id !== id)
-      updateAllTags(updatedEpisodes)
-      return updatedEpisodes
-    })
-  }
-
-  const updateAllTags = (updatedEpisodes: PodcastEpisode[]) => {
-    const tags = Array.from(
-      new Set(updatedEpisodes.flatMap((episode) => episode.tags))
-    )
-    setAllTags(tags)
-  }
-
   return (
     <main className="container max-w-5xl mx-auto py-10">
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold mb-4">
-          {userInfo?.channelName ||
-            `Welcome ${userInfo?.userName} to your Personal Podcast Channel`}
+          {channelInfo?.channelName ||
+            `Welcome ${channelInfo?.userName} to your Personal Podcast Channel`}
         </h1>
         <p className="text-xl text-muted-foreground">
-          {userInfo?.channelDescription || "Discover the latest episodes"}
+          {channelInfo?.channelDescription || "Discover the latest episodes"}
         </p>
       </div>
 
@@ -158,71 +80,69 @@ export default function Home() {
                   : "Fill in the details for your new podcast episode."}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="title" className="text-right">
-                    Title
-                  </Label>
-                  <Input
-                    id="title"
-                    name="title"
-                    defaultValue={editingEpisode?.title}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">
-                    Description
-                  </Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    defaultValue={editingEpisode?.description}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="url" className="text-right">
-                    Audio URL
-                  </Label>
-                  <Input
-                    id="url"
-                    name="url"
-                    defaultValue={editingEpisode?.url}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="thumbnail" className="text-right">
-                    Thumbnail
-                  </Label>
-                  <Input
-                    id="thumbnail"
-                    name="thumbnail"
-                    defaultValue={editingEpisode?.thumbnail}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="tags" className="text-right">
-                    Tags
-                  </Label>
-                  <Input
-                    id="tags"
-                    name="tags"
-                    defaultValue={editingEpisode?.tags.join(", ")}
-                    className="col-span-3"
-                    placeholder="Separate tags with commas"
-                  />
-                </div>
+            <form className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="title" className="text-right">
+                  Title
+                </Label>
+                <Input
+                  id="title"
+                  name="title"
+                  defaultValue={editingEpisode?.title}
+                  className="col-span-3"
+                />
               </div>
-              <DialogFooter>
-                <Button type="submit">
-                  {editingEpisode ? "Update" : "Add"} Episode
-                </Button>
-              </DialogFooter>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="description" className="text-right">
+                  Description
+                </Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  defaultValue={editingEpisode?.description}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="url" className="text-right">
+                  Audio URL
+                </Label>
+                <Input
+                  id="url"
+                  name="url"
+                  defaultValue={editingEpisode?.url}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="thumbnail" className="text-right">
+                  Thumbnail
+                </Label>
+                <Input
+                  id="thumbnail"
+                  name="thumbnail"
+                  defaultValue={editingEpisode?.thumbnail}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="tags" className="text-right">
+                  Tags
+                </Label>
+                <Input
+                  id="tags"
+                  name="tags"
+                  defaultValue={editingEpisode?.tags.join(", ")}
+                  className="col-span-3"
+                  placeholder="Separate tags with commas"
+                />
+              </div>
             </form>
+            <DialogFooter>
+              <Button type="submit">
+                {editingEpisode ? "Update" : "Add"} Episode
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
@@ -234,8 +154,10 @@ export default function Home() {
             <EpisodeCard
               key={episode.id}
               episode={episode}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
+              onEdit={() => setEditingEpisode(episode)}
+              onDelete={() => {
+                setEpisodes((prev) => prev.filter((ep) => ep.id !== episode.id))
+              }}
             />
           ))}
         </div>
