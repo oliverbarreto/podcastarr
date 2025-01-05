@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0677ed55-2718-4b79-828a-3a10938bf6a4",
+  "id": "1f0ee876-d718-466f-a947-2ada4df628ae",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "channels": {
-      "name": "channels",
+    "channel_info": {
+      "name": "channel_info",
       "columns": {
         "id": {
           "name": "id",
@@ -102,8 +102,8 @@
         }
       },
       "indexes": {
-        "channels_user_name_unique": {
-          "name": "channels_user_name_unique",
+        "channel_info_user_name_unique": {
+          "name": "channel_info_user_name_unique",
           "columns": [
             "user_name"
           ],
@@ -115,8 +115,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "episodes": {
-      "name": "episodes",
+    "podcast_episodes": {
+      "name": "podcast_episodes",
       "columns": {
         "id": {
           "name": "id",
@@ -184,10 +184,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "episodes_channel_id_channels_id_fk": {
-          "name": "episodes_channel_id_channels_id_fk",
-          "tableFrom": "episodes",
-          "tableTo": "channels",
+        "podcast_episodes_channel_id_channel_info_id_fk": {
+          "name": "podcast_episodes_channel_id_channel_info_id_fk",
+          "tableFrom": "podcast_episodes",
+          "tableTo": "channel_info",
           "columnsFrom": [
             "channel_id"
           ],

@@ -1,4 +1,4 @@
-CREATE TABLE `channels` (
+CREATE TABLE `channel_info` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`user_name` text NOT NULL,
 	`channel_name` text,
@@ -14,8 +14,8 @@ CREATE TABLE `channels` (
 	`language` text DEFAULT 'en'
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `channels_user_name_unique` ON `channels` (`user_name`);--> statement-breakpoint
-CREATE TABLE `episodes` (
+CREATE UNIQUE INDEX `channel_info_user_name_unique` ON `channel_info` (`user_name`);--> statement-breakpoint
+CREATE TABLE `podcast_episodes` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`title` text NOT NULL,
 	`description` text,
@@ -25,5 +25,5 @@ CREATE TABLE `episodes` (
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL,
 	`channel_id` integer,
-	FOREIGN KEY (`channel_id`) REFERENCES `channels`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`channel_id`) REFERENCES `channel_info`(`id`) ON UPDATE no action ON DELETE no action
 );

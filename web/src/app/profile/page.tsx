@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect } from "react"
-import Link from "next/link"
+import { useState } from "react"
+
+// import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -25,10 +27,10 @@ import {
   Mail,
   Globe
 } from "lucide-react"
-import { getCurrentChannel, updateChannel } from "./actions"
-import { ChannelInfo } from "@/app/types/channelinfo"
-import { useState } from "react"
+
 import { useUser } from "@/context/UserContext"
+
+import { getCurrentChannel, updateChannel } from "./actions"
 
 export default function ProfilePage() {
   const { toast } = useToast()
@@ -37,24 +39,37 @@ export default function ProfilePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
+    let mounted = true
+
     const loadChannel = async () => {
       try {
         const channel = await getCurrentChannel()
-        if (channel) {
+        if (mounted && channel) {
           updateChannelInfo(channel)
         }
       } catch (error) {
-        toast({
-          title: `Error ${error}`,
-          description: "Failed to load channel information",
-          variant: "destructive"
-        })
+        if (mounted) {
+          toast({
+            title: `Error ${error}`,
+            description: "Failed to load channel information",
+            variant: "destructive"
+          })
+        }
       } finally {
-        setIsLoading(false)
+        if (mounted) {
+          setIsLoading(false)
+        }
       }
     }
-    loadChannel()
-  }, [toast, updateChannelInfo])
+
+    if (isLoading) {
+      loadChannel()
+    }
+
+    return () => {
+      mounted = false
+    }
+  }, [isLoading, toast, updateChannelInfo])
 
   if (isLoading) {
     return (

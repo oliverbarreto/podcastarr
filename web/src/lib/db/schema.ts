@@ -16,7 +16,7 @@ export const channelInfoTable = sqliteTable("channel_info", {
   language: text("language").default("en")
 })
 
-export const episodesTable = sqliteTable("episodes", {
+export const podcastEpisodesTable = sqliteTable("podcast_episodes", {
   id: int("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   description: text("description"),
@@ -34,6 +34,6 @@ export const episodesTable = sqliteTable("episodes", {
 
 // Types for better type inference
 export type DBChannelInfo = typeof channelInfoTable.$inferSelect
-export type NewDBChannelInfo = typeof channelInfoTable.$inferInsert
-export type DBEpisode = typeof episodesTable.$inferSelect
-export type NewDBEpisode = typeof episodesTable.$inferInsert
+export type DBNewChannelInfo = typeof channelInfoTable.$inferInsert
+export type DBEpisode = typeof podcastEpisodesTable.$inferSelect
+export type DBNewEpisode = typeof podcastEpisodesTable.$inferInsert

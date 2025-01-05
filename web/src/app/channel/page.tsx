@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -16,7 +17,16 @@ import {
 import { Label } from "@/components/ui/label"
 import { PlusCircle } from "lucide-react"
 import EpisodeCard from "@/components/episodecard"
+import { useToast } from "@/hooks/use-toast"
+
 import { useUser } from "@/context/UserContext"
+
+import {
+  getAllEpisodes,
+  createEpisode,
+  editEpisode,
+  removeEpisode
+} from "./actions"
 
 import type { PodcastEpisode } from "@/app/types/podcastepisode"
 
@@ -33,6 +43,7 @@ const tagColors = [
 
 export default function ChannelPage() {
   const { channelInfo } = useUser()
+  const { toast } = useToast()
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [editingEpisode, setEditingEpisode] = useState<PodcastEpisode | null>(
@@ -40,6 +51,47 @@ export default function ChannelPage() {
   )
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [allTags, setAllTags] = useState<string[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    const loadEpisodes = async () => {
+      const fetchedEpisodes = await getAllEpisodes()
+      setEpisodes(fetchedEpisodes)
+      const tags = Array.from(
+        new Set(fetchedEpisodes.flatMap((episode) => episode.tags))
+      )
+      setAllTags(tags)
+    }
+    loadEpisodes()
+  }, [])
+
+  const updateAllTags = (updatedEpisodes: PodcastEpisode[]) => {
+    const tags = Array.from(
+      new Set(updatedEpisodes.flatMap((episode) => episode.tags))
+    )
+    setAllTags(tags)
+  }
+
+  const handleDelete = async (id: number) => {
+    const result = await removeEpisode(id)
+    if (result.success) {
+      setEpisodes((prev) => {
+        const updated = prev.filter((ep) => ep.id !== id)
+        updateAllTags(updated)
+        return updated
+      })
+      toast({
+        title: "Success",
+        description: "Episode deleted successfully"
+      })
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to delete episode",
+        variant: "destructive"
+      })
+    }
+  }
 
   const filteredEpisodes =
     selectedTags.length === 0
@@ -80,7 +132,49 @@ export default function ChannelPage() {
                   : "Fill in the details for your new podcast episode."}
               </DialogDescription>
             </DialogHeader>
-            <form className="grid gap-4 py-4">
+            <form
+              action={async (formData) => {
+                if (isSubmitting) return
+                setIsSubmitting(true)
+                try {
+                  const result = editingEpisode
+                    ? await editEpisode(editingEpisode.id, formData)
+                    : await createEpisode(formData)
+
+                  if (result.success && result.data) {
+                    if (editingEpisode) {
+                      setEpisodes((prev) =>
+                        prev.map((ep) =>
+                          ep.id === result.data.id ? result.data : ep
+                        )
+                      )
+                    } else {
+                      setEpisodes((prev) => [...prev, result.data])
+                    }
+                    updateAllTags([...episodes, result.data])
+                    setIsOpen(false)
+                    setEditingEpisode(null)
+                    toast({
+                      title: "Success",
+                      description: `Episode ${
+                        editingEpisode ? "updated" : "created"
+                      } successfully`
+                    })
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: `Failed to ${
+                        editingEpisode ? "update" : "create"
+                      } episode`,
+                      variant: "destructive"
+                    })
+                  }
+                } finally {
+                  setIsSubmitting(false)
+                }
+              }}
+              className="grid gap-4 py-4"
+            >
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="title" className="text-right">
                   Title
@@ -137,12 +231,17 @@ export default function ChannelPage() {
                   placeholder="Separate tags with commas"
                 />
               </div>
+              <DialogFooter>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? "Saving..."
+                    : editingEpisode
+                    ? "Update"
+                    : "Add"}{" "}
+                  Episode
+                </Button>
+              </DialogFooter>
             </form>
-            <DialogFooter>
-              <Button type="submit">
-                {editingEpisode ? "Update" : "Add"} Episode
-              </Button>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
@@ -154,10 +253,11 @@ export default function ChannelPage() {
             <EpisodeCard
               key={episode.id}
               episode={episode}
-              onEdit={() => setEditingEpisode(episode)}
-              onDelete={() => {
-                setEpisodes((prev) => prev.filter((ep) => ep.id !== episode.id))
+              onEdit={() => {
+                setEditingEpisode(episode)
+                setIsOpen(true)
               }}
+              onDelete={() => handleDelete(episode.id)}
             />
           ))}
         </div>

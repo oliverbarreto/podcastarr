@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, useCallback } from "react"
 import type { ChannelInfo } from "@/app/types/channelinfo"
 
 interface UserContextType {
@@ -13,9 +13,9 @@ const UserContext = createContext<UserContextType | undefined>(undefined)
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null)
 
-  const updateChannelInfo = (info: ChannelInfo) => {
+  const updateChannelInfo = useCallback((info: ChannelInfo) => {
     setChannelInfo(info)
-  }
+  }, [])
 
   return (
     <UserContext.Provider value={{ channelInfo, updateChannelInfo }}>
