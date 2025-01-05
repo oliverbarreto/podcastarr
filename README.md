@@ -18,6 +18,8 @@
 
 ## Roadmap
 
+### Basic Requirements
+
 1. Create NEXTJS app skeleton with shadcn ui and tailwindcss
 
    1. basic layout
@@ -37,13 +39,13 @@
    8. Personal Public page to show the data about the channel: sometimes required to have a public page to show the data about the channel
    9. Podcast XML Feed for iTunes
 
-### Other Requirements for features:
+#### Other Requirements for features:
 
 - the user must be able to add an episode
 - the user must be able to delete an episode
 - the user must be able to edit an episode
 
-### Other Requirements:
+#### Other Requirements:
 
 - Use TailwindCSS for styling
 - Use Shadcn UI for components
@@ -52,6 +54,10 @@
 - Use NextJS for server components
 - Use NextJS for server actions
 - Use NextJS for server components
+
+## Data Base
+
+- Use SQLite for the data base
 
 ## Discarded Features for now
 
