@@ -40,3 +40,7 @@ web/.vercel
 # typescript
 web/*.tsbuildinfo
 web/next-env.d.ts
+
+
+# DATABASE
+web/data/*

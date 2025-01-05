@@ -1,3 +1,5 @@
+import internal from "stream"
+
 export type UserInfo = {
   id: number
   userName: string
@@ -10,6 +12,6 @@ export type UserInfo = {
   authorEmail: string
   ownerName: string
   ownerEmail: string
-  isExplicitContent: boolean
+  isExplicitContent: number
   language: string
 }

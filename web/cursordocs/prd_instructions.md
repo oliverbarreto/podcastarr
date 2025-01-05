@@ -46,7 +46,7 @@
 
 - use drizzle as ORM
 - Use SQLite for the data base
-  - https://orm.drizzle.team/docs/column-types/sqlite
+  - https://orm.drizzle.team/docs/get-started/sqlite-new
 - refactor the code to change current local storage mock data to DB data and use nextjs server actions to save the data into the DB
 - Refactor:
   - User and Channel info
