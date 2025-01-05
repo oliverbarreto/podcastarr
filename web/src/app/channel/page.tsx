@@ -21,7 +21,7 @@ import {
   updateEpisode,
   deleteEpisode,
   getUserInfo
-} from "@/lib/db"
+} from "@/lib/db/db"
 import EpisodeCard from "@/components/episodecard"
 
 import { UserInfo } from "@/app/types/user"

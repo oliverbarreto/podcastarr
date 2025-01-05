@@ -1,6 +1,4 @@
-import internal from "stream"
-
-export type UserInfo = {
+export type ChannelInfo = {
   id: number
   userName: string
   channelName: string
@@ -12,6 +10,6 @@ export type UserInfo = {
   authorEmail: string
   ownerName: string
   ownerEmail: string
-  isExplicitContent: number
+  isExplicitContent: number // Changed from boolean to number for SQLite compatibility
   language: string
 }

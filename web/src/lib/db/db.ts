@@ -1,65 +1,73 @@
 import { eq } from "drizzle-orm"
 import db from "@/lib/db/drizzle"
-import { usersTable, type DBNewUser, type DBUser } from "@/lib/db/schema"
-import { UserInfo } from "@/app/types/user"
 
-// Convert DB type to UserInfo type
-const dbUserToUserInfo = (dbUser: DBUser): UserInfo => ({
-  id: dbUser.id,
-  userName: dbUser.userName,
-  channelName: dbUser.channelName ?? "",
-  channelDescription: dbUser.channelDescription ?? "",
-  logoUrl: dbUser.logoUrl ?? "",
-  personalWebsite: dbUser.personalWebsite ?? "",
-  feedUrl: dbUser.feedUrl ?? "",
-  authorName: dbUser.authorName ?? "",
-  authorEmail: dbUser.authorEmail ?? "",
-  ownerName: dbUser.ownerName ?? "",
-  ownerEmail: dbUser.ownerEmail ?? "",
-  isExplicitContent: dbUser.is_explicit_content ?? false,
-  language: dbUser.language ?? "en"
+import {
+  channelInfoTable,
+  // episodesTable,
+  type DBChannelInfo,
+  type NewDBChannelInfo
+} from "./schema"
+
+import type { ChannelInfo } from "@/app/types/channelinfo"
+// import type { PodcastEpisode } from "@/app/types/podcastepisode"
+
+// Convert DB type to ChannelInfo type
+const dbChannelToChannelInfo = (dbChannel: DBChannelInfo): ChannelInfo => ({
+  id: dbChannel.id,
+  userName: dbChannel.userName,
+  channelName: dbChannel.channelName ?? "",
+  channelDescription: dbChannel.channelDescription ?? "",
+  logoUrl: dbChannel.logoUrl ?? "",
+  personalWebsite: dbChannel.personalWebsite ?? "",
+  feedUrl: dbChannel.feedUrl ?? "",
+  authorName: dbChannel.authorName ?? "",
+  authorEmail: dbChannel.authorEmail ?? "",
+  ownerName: dbChannel.ownerName ?? "",
+  ownerEmail: dbChannel.ownerEmail ?? "",
+  isExplicitContent: dbChannel.isExplicitContent,
+  language: dbChannel.language ?? "en"
 })
 
-export const getUserInfo = async (
+export const getChannelInfo = async (
   userName: string
-): Promise<UserInfo | null> => {
-  const users = await db
+): Promise<ChannelInfo | null> => {
+  const channels = await db
     .select()
-    .from(usersTable)
-    .where(eq(usersTable.userName, userName))
+    .from(channelInfoTable)
+    .where(eq(channelInfoTable.userName, userName))
     .limit(1)
 
-  if (!users.length) return null
+  if (!channels.length) return null
 
-  return dbUserToUserInfo(users[0])
+  return dbChannelToChannelInfo(channels[0])
 }
 
-export const setUserInfo = async (
-  userInfo: Omit<UserInfo, "id">
-): Promise<UserInfo> => {
-  const newUser: DBNewUser = {
-    userName: userInfo.userName,
-    channelName: userInfo.channelName,
-    channelDescription: userInfo.channelDescription,
-    logoUrl: userInfo.logoUrl,
-    personalWebsite: userInfo.personalWebsite,
-    feedUrl: userInfo.feedUrl,
-    authorName: userInfo.authorName,
-    authorEmail: userInfo.authorEmail,
-    ownerName: userInfo.ownerName,
-    ownerEmail: userInfo.ownerEmail,
-    isExplicitContent: userInfo.isExplicitContent,
-    language: userInfo.language
+export const setChannelInfo = async (
+  channelInfo: Omit<ChannelInfo, "id">
+): Promise<ChannelInfo> => {
+  const newChannel: NewDBChannelInfo = {
+    userName: channelInfo.userName,
+    channelName: channelInfo.channelName,
+    channelDescription: channelInfo.channelDescription,
+    logoUrl: channelInfo.logoUrl,
+    personalWebsite: channelInfo.personalWebsite,
+    feedUrl: channelInfo.feedUrl,
+    authorName: channelInfo.authorName,
+    authorEmail: channelInfo.authorEmail,
+    ownerName: channelInfo.ownerName,
+    ownerEmail: channelInfo.ownerEmail,
+    isExplicitContent: channelInfo.isExplicitContent,
+    language: channelInfo.language
   }
 
-  const result = await db
-    .insert(usersTable)
-    .values(newUser)
+  const [result] = await db
+    .insert(channelInfoTable)
+    .values(newChannel)
     .onConflictDoUpdate({
-      target: usersTable.userName,
-      set: newUser
+      target: channelInfoTable.userName,
+      set: newChannel
     })
     .returning()
 
-  return dbUserToUserInfo(result[0])
+  return dbChannelToChannelInfo(result)
 }

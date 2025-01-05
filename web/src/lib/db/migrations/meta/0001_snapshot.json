@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0677ed55-2718-4b79-828a-3a10938bf6a4",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "36c978bb-b741-4acf-b7e8-29eae2a66401",
+  "prevId": "0677ed55-2718-4b79-828a-3a10938bf6a4",
   "tables": {
-    "channels": {
-      "name": "channels",
+    "channel_info": {
+      "name": "channel_info",
       "columns": {
         "id": {
           "name": "id",
@@ -102,8 +102,8 @@
         }
       },
       "indexes": {
-        "channels_user_name_unique": {
-          "name": "channels_user_name_unique",
+        "channel_info_user_name_unique": {
+          "name": "channel_info_user_name_unique",
           "columns": [
             "user_name"
           ],
@@ -184,10 +184,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "episodes_channel_id_channels_id_fk": {
-          "name": "episodes_channel_id_channels_id_fk",
+        "episodes_channel_id_channel_info_id_fk": {
+          "name": "episodes_channel_id_channel_info_id_fk",
           "tableFrom": "episodes",
-          "tableTo": "channels",
+          "tableTo": "channel_info",
           "columnsFrom": [
             "channel_id"
           ],

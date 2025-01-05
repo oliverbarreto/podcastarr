@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function Navbar() {
   const router = useRouter()
-  const { userInfo } = useUser()
+  const { channelInfo } = useUser()
 
   const handleProfileClick = () => {
     router.push("/profile")
@@ -40,10 +40,10 @@ export default function Navbar() {
             onClick={handleProfileClick}
             className="rounded-full p-0 w-8 h-8 overflow-hidden"
           >
-            {userInfo?.logoUrl ? (
+            {channelInfo?.logoUrl ? (
               <img
-                src={userInfo.logoUrl}
-                alt="User Profile"
+                src={channelInfo.logoUrl}
+                alt="Channel Logo"
                 className="w-full h-full object-cover"
               />
             ) : (
