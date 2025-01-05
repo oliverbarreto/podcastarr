@@ -1,7 +1,8 @@
 "use server"
 
-import { getChannelInfo, setChannelInfo } from "@/lib/db/db"
 import { ChannelInfo } from "@/app/types/channelinfo"
+
+import { getChannelInfo, setChannelInfo } from "@/lib/db/db"
 
 export async function getCurrentChannel(
   userName: string = "defaultuser"

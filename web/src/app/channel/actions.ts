@@ -1,12 +1,13 @@
 "use server"
 
+import type { PodcastEpisode } from "@/app/types/podcastepisode"
+
 import {
   getEpisodes,
   addEpisode,
   updateEpisode,
   deleteEpisode
 } from "@/lib/db/db"
-import type { PodcastEpisode } from "@/app/types/podcastepisode"
 
 export async function getAllEpisodes(): Promise<PodcastEpisode[]> {
   try {
