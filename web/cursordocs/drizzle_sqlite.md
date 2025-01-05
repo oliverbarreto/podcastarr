@@ -1,175 +1,195 @@
-https://orm.drizzle.team/docs/column-types/sqlite
+- https://orm.drizzle.team/docs/get-started/sqlite-new
 
-SQLite column types
-Based on the official SQLite docs, each value stored in an SQLite database (or manipulated by the database engine) has one of the following storage classes NULL, INTEGER, REAL, TEXT and BLOB.
-We have native support for all of them, yet if that’s not enough for you, feel free to create custom types.
-IMPORTANT
-All examples in this part of the documentation do not use database column name aliases, and column names are generated from TypeScript keys.
-You can use database aliases in column names if you want, and you can also use the casing parameter to define a mapping strategy for Drizzle.
-You can read more about it here
-Integer
-A signed integer, stored in 0, 1, 2, 3, 4, 6, or 8 bytes depending on the magnitude of the value.
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-id: integer()
-});
-// you can customize integer mode to be number, boolean, timestamp, timestamp_ms
-integer({ mode: 'number' })
-integer({ mode: 'boolean' })
-integer({ mode: 'timestamp_ms' })
-integer({ mode: 'timestamp' }) // Date
+# Get Started with Drizzle and SQLite
 
-CREATE TABLE `table` (
-`id` integer
-);
+This guide assumes familiarity with:
 
-// to make integer primary key auto increment
-integer({ mode: 'number' }).primaryKey({ autoIncrement: true })
+- dotenv - package for managing environment variables - read here
+- tsx - package for running TypeScript files - read here
+- libsql - a fork of SQLite optimized for low query latency, making it suitable for global applications - read here
 
-CREATE TABLE `table` (
-`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL
-);
+Drizzle has native support for SQLite connections with the libsql and better-sqlite3 drivers.
+We will use libsql for this get started example. But if you want to find more ways to connect to SQLite check our SQLite Connection page
 
-Real
-A floating point value, stored as an 8-byte IEEE floating point number.
-import { real, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-real: real()
-});
+## Basic file structure
 
-CREATE TABLE `table` (
-`real` real
-);
+This is the basic file structure of the project. In the src/db directory, we have table definition in schema.ts. In drizzle folder there are sql migration file and snapshots.
 
-Text
-A text string, stored using the database encoding (UTF-8, UTF-16BE or UTF-16LE).
-You can define { enum: ["value1", "value2"] } config to infer insert and select types, it won’t check runtime values.
-import { text, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-text: text()
-});
-// will be inferred as text: "value1" | "value2" | null
-text({ enum: ["value1", "value2"] })
-text({ mode: 'json' })
-text({ mode: 'json' }).$type<{ foo: string }>()
+📦 <project root>
+├ 📂 drizzle
+├ 📂 src
+│ ├ 📂 db
+│ │ └ 📜 schema.ts
+│ └ 📜 index.ts
+├ 📜 .env
+├ 📜 drizzle.config.ts
+├ 📜 package.json
+└ 📜 tsconfig.json
 
-CREATE TABLE `table` (
-`text` text
-);
+## Step 1 - Install required packages
 
-Blob
-A blob of data, stored exactly as it was input.
-It’s recommended to use text('', { mode: 'json' }) instead of blob('', { mode: 'json' }), because it supports JSON functions:
-All JSON functions currently throw an error if any of their arguments are BLOBs because BLOBs are reserved for a future enhancement in which BLOBs will store the binary encoding for JSON.
-See https://www.sqlite.org/json1.html.
-import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-blob: blob()
-});
-blob()
-blob({ mode: 'buffer' })
-blob({ mode: 'bigint' })
-blob({ mode: 'json' })
-blob({ mode: 'json' }).$type<{ foo: string }>()
+```bash
+npm i drizzle-orm @libsql/client dotenv
+npm i -D drizzle-kit tsx
+```
 
-CREATE TABLE `table` (
-`blob` blob
-);
+## Step 2 - Setup connection variables
 
-You can specify .$type<..>() for blob inference, it won’t check runtime values. It provides compile time protection for default values, insert and select schemas.
-// will be inferred as { foo: string }
-json: blob({ mode: 'json' }).$type<{ foo: string }>();
-// will be inferred as string[]
-json: blob({ mode: 'json' }).$type<string[]>();
-// won't compile
-json: blob({ mode: 'json' }).$type<string[]>().default({});
+Create a .env file in the root of your project and add your database connection variable:
 
-Boolean
-SQLite does not have native boolean data type, yet you can specify integer column to be in a boolean mode. This allows you to operate boolean values in your code and Drizzle stores them as 0 and 1 integer values in the database.
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-id: integer({ mode: 'boolean' })
-});
+```bash
+DB_FILE_NAME=
+```
 
-CREATE TABLE `table` (
-`id` integer
-);
+> IMPORTANT
+> For example, if you want to create an SQLite database file in the root of your project for testing purposes, you need to use file: before the actual filename, as this is the format required by LibSQL, like this:
+> `DB_FILE_NAME=file:local.db`
 
-Bigint
-Since there is no bigint data type in SQLite, Drizzle offers a special bigint mode for blob columns. This mode allows you to work with BigInt instances in your code, and Drizzle stores them as blob values in the database.
-import { blob, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-id: blob({ mode: 'bigint' })
-});
+You can check the LibSQL docs for more info.
 
-CREATE TABLE `table` (
-`id` blob
-);
+## Step 3 - Connect Drizzle ORM to the database
 
-Customizing data type
-Every column builder has a .$type() method, which allows you to customize the data type of the column. This is useful, for example, with unknown or branded types.
-type UserId = number & { __brand: 'user_id' };
-type Data = {
-	foo: string;
-	bar: number;
-};
-const users = sqliteTable('users', {
-  id: integer().$type<UserId>().primaryKey(),
-jsonField: blob().$type<Data>(),
-});
+Create a index.ts file in the src directory and initialize the connection:
 
-Not null
-NOT NULL constraint dictates that the associated column may not contain a NULL value.
-const table = sqliteTable('table', {
-numInt: integer().notNull()
-});
+```ts
+import "dotenv/config"
+import { drizzle } from "drizzle-orm/libsql"
+const db = drizzle(process.env.DB_FILE_NAME!)
+```
 
-CREATE TABLE table (
-`numInt` integer NOT NULL
-);
+If you need to provide your existing driver:
 
-Default value
-The DEFAULT clause specifies a default value to use for the column if no value is explicitly provided by the user when doing an INSERT. If there is no explicit DEFAULT clause attached to a column definition, then the default value of the column is NULL.
-An explicit DEFAULT clause may specify that the default value is NULL, a string constant, a blob constant, a signed-number, or any constant expression enclosed in parentheses.
-import { sql } from "drizzle-orm";
-import { integer, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-int1: integer().default(42),
-int2: integer().default(sql`(abs(42))`)
-});
+```ts
+import "dotenv/config"
+import { drizzle } from "drizzle-orm/libsql"
+import { createClient } from "@libsql/client"
+const client = createClient({ url: process.env.DB_FILE_NAME! })
+const db = drizzle({ client })
+```
 
-CREATE TABLE `table` (
-`int1` integer DEFAULT 42
-`int2` integer DEFAULT (abs(42))
-);
+## Step 4 - Create a table
 
-A default value may also be one of the special case-independent keywords CURRENT_TIME, CURRENT_DATE or CURRENT_TIMESTAMP.
-import { sql } from "drizzle-orm";
-import { text, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable("table", {
-time: text().default(sql`(CURRENT_TIME)`),
-date: text().default(sql`(CURRENT_DATE)`),
-timestamp: text().default(sql`(CURRENT_TIMESTAMP)`),
-});
+Create a schema.ts file in the src/db directory and declare your table:
+`src/db/schema.ts`
 
-CREATE TABLE `table` (
-`time` text DEFAULT (CURRENT_TIME)
-`date` text DEFAULT (CURRENT_DATE)
-`timestamp` text DEFAULT (CURRENT_TIMESTAMP)
-);
+```ts
+import { int, sqliteTable, text } from "drizzle-orm/sqlite-core"
+export const usersTable = sqliteTable("users_table", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  age: int().notNull(),
+  email: text().notNull().unique()
+})
+```
 
-When using $default() or $defaultFn(), which are simply different aliases for the same function, you can generate defaults at runtime and use these values in all insert queries. These functions can assist you in utilizing various implementations such as uuid, cuid, cuid2, and many more.
-Note: This value does not affect the drizzle-kit behavior, it is only used at runtime in drizzle-orm
-import { text, sqliteTable } from "drizzle-orm/sqlite-core";
-import { createId } from '@paralleldrive/cuid2';
-const table = sqliteTable('table', {
-	id: text().$defaultFn(() => createId()),
-});
+## Step 5 - Setup Drizzle config file
 
-When using $onUpdate() or $onUpdateFn(), which are simply different aliases for the same function, you can generate defaults at runtime and use these values in all update queries.
-Adds a dynamic update value to the column. The function will be called when the row is updated, and the returned value will be used as the column value if none is provided. If no default (or $defaultFn) value is provided, the function will be called when the row is inserted as well, and the returned value will be used as the column value.
-Note: This value does not affect the drizzle-kit behavior, it is only used at runtime in drizzle-orm
-import { text, sqliteTable } from "drizzle-orm/sqlite-core";
-const table = sqliteTable('table', {
-    alwaysNull: text().$type<string | null>().$onUpdate(() => null),
-});
+Drizzle config - a configuration file that is used by Drizzle Kit and contains all the information about your database connection, migration folder and schema files.
+Create a drizzle.config.ts file in the root of your project and add the following content:
+`drizzle.config.ts`
+
+```ts
+import "dotenv/config"
+import { defineConfig } from "drizzle-kit"
+export default defineConfig({
+  out: "./drizzle",
+  schema: "./src/db/schema.ts",
+  dialect: "sqlite",
+  dbCredentials: {
+    url: process.env.DB_FILE_NAME!
+  }
+})
+```
+
+## Step 6 - Applying changes to the database
+
+You can directly apply changes to your database using the drizzle-kit push command. This is a convenient method for quickly testing new schema designs or modifications in a local development environment, allowing for rapid iterations without the need to manage migration files:
+
+```bash
+npx drizzle-kit push
+```
+
+Read more about the push command in documentation.
+
+### TIPS
+
+Alternatively, you can generate migrations using the drizzle-kit generate command and then apply them using the drizzle-kit migrate command:
+
+```bash
+Generate migrations:
+npx drizzle-kit generate
+
+Apply migrations:
+npx drizzle-kit migrate
+
+Read more about migration process in documentation.
+```
+
+## Step 7 - Seed and Query the database
+
+Let’s update the src/index.ts file with queries to create, read, update, and delete users
+`src/index.ts`
+
+```ts
+import "dotenv/config"
+import { drizzle } from "drizzle-orm/libsql"
+import { eq } from "drizzle-orm"
+import { usersTable } from "./db/schema"
+
+const db = drizzle(process.env.DB_FILE_NAME!)
+
+async function main() {
+  const user: typeof usersTable.$inferInsert = {
+    name: "John",
+    age: 30,
+    email: "john@example.com"
+  }
+
+  await db.insert(usersTable).values(user)
+  console.log("New user created!")
+
+  const users = await db.select().from(usersTable)
+  console.log("Getting all users from the database: ", users)
+  /*
+  const users: {
+    id: number;
+    name: string;
+    age: number;
+    email: string;
+  }[]
+  */
+
+  await db
+    .update(usersTable)
+    .set({
+      age: 31
+    })
+    .where(eq(usersTable.email, user.email))
+  console.log("User info updated!")
+
+  await db.delete(usersTable).where(eq(usersTable.email, user.email))
+  console.log("User deleted!")
+}
+
+main()
+```
+
+## Step 8 - Run index.ts file
+
+To run any TypeScript files, you have several options, but let’s stick with one: using tsx
+You’ve already installed tsx, so we can run our queries now
+Run `index.ts` script
+
+```bash
+npx tsx src/index.ts
+```
+
+### TIPS
+
+We suggest using bun to run TypeScript files. With bun, such scripts can be executed without issues or additional settings, regardless of whether your project is configured with CommonJS (CJS), ECMAScript Modules (ESM), or any other module format. To run a script with bun, use the following command:
+
+```bash
+bun src/index.ts
+```
+
+If you don’t have bun installed, check the Bun installation docs
